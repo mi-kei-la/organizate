@@ -6,7 +6,7 @@ Un diagrama para ordenarte, hecho jueguito: te va haciendo preguntas, vos respon
 
 ## Antes de arrancar
 
-Esto no es una guía completa ni pretende serlo. Es una herramienta para darte una mano a organizarte vos y tus pendientes, nada más. Capaz te sirve, capaz no: usala como te quede cómoda.
+Esto no es una guía completa ni pretende serlo. Es una herramienta para darte una mano para organizarte vos y tus pendientes, nada más. Capaz te sirve, capaz no: usala como te quede cómoda.
 
 No reemplaza ningún consejo profesional, y lo que hagas con ella corre por tu cuenta. No me hago responsable de ningún problema que te pueda traer.
 
