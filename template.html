@@ -1,0 +1,494 @@
+<title>Qué querés organizar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/*FONTFACES*/
+/* Layout: hoja cuadriculada; a la izquierda la charla con el diagrama, a la derecha el mapa con el camino recorrido. */
+:root {
+  --paper: #f5f7fa; --grid: #e1e7ee; --card: #ffffff; --ink: #1e1e1e; --muted: #5a6470;
+  --accent: #2f9e44; --accent-soft: #d3f9d8; --c-blue: #1971c2; --c-red: #e03131;
+  --f-pink: #fff5f5; --f-blue: #e7f5ff; --f-mint: #e6fcf5; --f-green: #ebfbee;
+  --postit: #ffec99; --postit-edge: #f0c419;
+  --hand: Excalifont, "Comic Neue", "Segoe Print", "Bradley Hand", cursive;
+  --ui: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --step-0: 1rem; --step-1: 1.2rem; --step-2: 1.5rem; --step-3: clamp(1.9rem, 4vw, 2.6rem);
+  --wobble: 255px 14px 225px 14px / 14px 225px 14px 255px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14171b; --grid: #20262d; --card: #1b1f24; --ink: #ebe8e2; --muted: #9ba5af;
+  --accent: #69db7c; --accent-soft: #1f3b27; --c-blue: #74c0fc; --c-red: #ff8787;
+  --f-pink: #3a2326; --f-blue: #13293d; --f-mint: #10332b; --f-green: #17351f;
+  --postit: #4d4116; --postit-edge: #8a7320; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #14171b; --grid: #20262d; --card: #1b1f24; --ink: #ebe8e2; --muted: #9ba5af;
+  --accent: #69db7c; --accent-soft: #1f3b27; --c-blue: #74c0fc; --c-red: #ff8787;
+  --f-pink: #3a2326; --f-blue: #13293d; --f-mint: #10332b; --f-green: #17351f;
+  --postit: #4d4116; --postit-edge: #8a7320; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper); color: var(--ink); font-family: var(--ui); font-size: var(--step-0); line-height: 1.5;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 20px; }
+
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+.eyebrow { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 0; }
+h1 { font-family: var(--hand); font-weight: 400; font-size: var(--step-3); line-height: 1.1; margin: 2px 0 0; text-wrap: balance; }
+.finales { display: grid; gap: 6px; min-width: 0; }
+.finales p { margin: 0; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.finales p b { color: var(--ink); }
+.slots { display: flex; flex-wrap: wrap; gap: 6px; }
+.slot { width: 34px; height: 34px; border: 1.5px dashed var(--muted); border-radius: 6px; display: grid; place-items: center;
+  font-family: var(--hand); color: var(--muted); background: transparent; padding: 0; }
+.slot.on { border-style: solid; border-color: var(--ink); background: var(--f-mint); color: var(--ink); cursor: pointer; }
+.slot.on:hover { transform: rotate(-4deg); }
+
+.tabs { display: none; gap: 4px; padding: 4px; border: 1.5px solid var(--ink); border-radius: var(--wobble); background: var(--card); width: max-content; }
+.tabs button { border: 0; background: transparent; padding: 6px 16px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 28px; align-items: start; }
+.chat { display: grid; gap: 14px; min-width: 0; max-width: 680px; }
+#log { display: grid; gap: 12px; }
+
+.say { justify-self: start; max-width: min(100%, 520px); background: var(--card); border: 2px solid var(--ink); border-radius: var(--wobble);
+  padding: 12px 18px; font-family: var(--hand); font-size: var(--step-1); line-height: 1.35; position: relative; }
+.say.f-pink { background: var(--f-pink); } .say.f-blue { background: var(--f-blue); }
+.say.f-mint { background: var(--f-mint); } .say.f-green { background: var(--f-green); }
+.say .start { display: block; color: var(--accent); font-size: .95rem; letter-spacing: .04em; }
+.say .again { position: absolute; top: -11px; right: 12px; font-family: var(--ui); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase;
+  background: var(--paper); border: 1px solid var(--muted); color: var(--muted); padding: 0 6px; border-radius: 4px; }
+.say.fork { font-family: var(--ui); font-size: .95rem; border-style: dashed; border-width: 1.5px; color: var(--muted); }
+.me { justify-self: end; max-width: min(85%, 420px); background: var(--postit); border-bottom: 3px solid var(--postit-edge);
+  padding: 8px 16px 10px; font-family: var(--hand); font-size: var(--step-1); transform: rotate(1.2deg); box-shadow: 0 2px 0 rgba(0,0,0,.06); }
+.me:nth-child(4n) { transform: rotate(-1deg); }
+.pick { justify-self: end; color: var(--muted); font-size: .9rem; }
+
+.final { justify-self: stretch; background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
+.final .eyebrow { color: var(--accent); }
+.final svg { width: 100%; height: auto; display: block; background: var(--paper); border-radius: 6px; }
+
+#opts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; padding-top: 4px; }
+.opt { font-family: var(--hand); font-size: var(--step-1); background: var(--card); border: 2px solid var(--ink); border-radius: var(--wobble);
+  padding: 8px 16px; cursor: pointer; text-align: left; max-width: 100%; transition: transform .12s, background .12s; }
+.opt:hover { background: var(--postit); transform: translateY(-2px) rotate(-.6deg); }
+.opt.go { border-style: dashed; }
+.opt.go::before { content: "→ "; color: var(--muted); }
+.opt.sys { font-family: var(--ui); font-size: .95rem; }
+.ask { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; align-items: center; width: 100%; }
+.ask label { font-family: var(--hand); font-size: var(--step-1); }
+.ask input { font-family: var(--hand); font-size: var(--step-1); color: var(--ink); background: var(--postit); border: 0;
+  border-bottom: 3px solid var(--postit-edge); padding: 6px 12px; min-width: 0; flex: 1 1 220px; max-width: 360px; }
+.ask input::placeholder { color: var(--muted); }
+.note, .notebox textarea { font-family: var(--hand); font-size: var(--step-1); line-height: 1.6; color: var(--ink);
+  background-color: var(--card); background-image: repeating-linear-gradient(transparent 0 calc(1.6em - 1px), var(--grid) calc(1.6em - 1px) 1.6em);
+  border: 1.5px solid var(--grid); border-left: 3px solid var(--c-red); padding: 4px 14px; }
+.note { justify-self: end; max-width: min(85%, 460px); white-space: pre-wrap; overflow-wrap: anywhere; }
+.notebox { width: 100%; display: grid; gap: 4px; }
+.notebox label { font-size: .85rem; color: var(--muted); }
+.notebox textarea { width: 100%; min-height: 4.8em; resize: vertical; }
+.notebox textarea::placeholder { color: var(--muted); }
+.summary { display: grid; gap: 12px; }
+.summary h3 { font-family: var(--hand); font-weight: 400; font-size: var(--step-1); margin: 0; }
+.summary ul { margin: 4px 0 0; padding-left: 1.2em; font-family: var(--hand); font-size: var(--step-1); }
+.summary li { white-space: pre-wrap; overflow-wrap: anywhere; }
+.summary .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.summary textarea { width: 100%; min-height: 8em; font: .85rem/1.5 ui-monospace, monospace; color: var(--ink); background: var(--paper); border: 1px solid var(--grid); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1.5px dashed var(--grid); padding-top: 12px; }
+.tool { background: transparent; border: 1px solid var(--muted); color: var(--muted); border-radius: 999px; padding: 4px 14px; cursor: pointer; font-size: .9rem; }
+.tool:hover:not(:disabled) { color: var(--ink); border-color: var(--ink); }
+.tool:disabled { opacity: .45; cursor: default; }
+
+.map { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 8px; min-width: 0; }
+.maphead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.maphead .tools { border: 0; padding: 0; }
+#mapwrap { height: min(78vh, 900px); overflow: auto; border: 2px solid var(--ink); border-radius: 10px; background: var(--paper); }
+#map { display: block; }
+.legend { font-size: .8rem; color: var(--muted); margin: 0; }
+
+/* escena del diagrama (se dibuja una vez en <defs> y se reutiliza) */
+.n { fill: transparent; stroke: var(--ink); stroke-width: 2; }
+.n.f-pink { fill: var(--f-pink); } .n.f-blue { fill: var(--f-blue); } .n.f-mint { fill: var(--f-mint); } .n.f-green { fill: var(--f-green); }
+.n.s-green { stroke: var(--accent); } .n.s-blue { stroke: var(--c-blue); }
+.n.v { stroke: var(--accent); stroke-width: 4; }
+.n.cur { stroke: var(--accent); stroke-width: 7; fill: var(--accent-soft); }
+.e { fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linejoin: round; opacity: .8; }
+.e.v { stroke: var(--accent); stroke-width: 4; opacity: 1; }
+.ah { fill: var(--muted); } .ah-v { fill: var(--accent); }
+.ln { fill: none; stroke: var(--ink); stroke-width: 2; }
+.tx { font-family: var(--hand); fill: var(--ink); }
+.tx.c-green { fill: var(--accent); } .tx.c-blue { fill: var(--c-blue); } .tx.c-red { fill: var(--c-red); }
+
+dialog { border: 2px solid var(--ink); border-radius: 12px; background: var(--card); color: var(--ink); padding: 16px; width: min(560px, calc(100vw - 32px)); }
+dialog::backdrop { background: rgba(10, 14, 18, .45); }
+dialog svg { width: 100%; height: auto; display: block; background: var(--paper); border-radius: 6px; }
+dialog form { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+.new { animation: pop .32s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+.me.new { animation-name: stick; }
+@keyframes stick { from { opacity: 0; transform: translateY(-6px) rotate(6deg); } }
+
+@media (max-width: 959px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .tabs { display: flex; }
+  body[data-view="chat"] .map, body[data-view="map"] .chat { display: none; }
+  .map { position: static; }
+  #mapwrap { height: 72vh; }
+}
+@media (prefers-reduced-motion: reduce) { .new, .me.new { animation: none; } .opt, .slot { transition: none; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="ah-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="ah-v" d="M0 0 L10 5 L0 10 z"/></marker>
+    <g id="scene"></g>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">el diagrama, de a una pregunta</p>
+      <h1>qué querés organizar?</h1>
+    </div>
+    <div class="finales" aria-live="polite">
+      <p id="count"></p>
+      <div class="slots" id="slots"></div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button id="tab-chat" role="tab" aria-selected="true" data-view="chat">charla</button>
+    <button id="tab-map" role="tab" aria-selected="false" data-view="map">mapa</button>
+  </div>
+
+  <div class="layout">
+    <section class="chat" aria-label="Charla con el diagrama">
+      <div id="log" aria-live="polite"></div>
+      <div id="opts"></div>
+      <div class="tools">
+        <button class="tool" id="back">← volver un paso</button>
+        <button class="tool" id="restart">empezar de nuevo</button>
+        <button class="tool" id="mynotes">tus notas</button>
+      </div>
+    </section>
+
+    <aside class="map" aria-label="Mapa del diagrama">
+      <div class="maphead">
+        <p class="eyebrow">mapa · tu camino en verde</p>
+        <div class="tools">
+          <button class="tool" id="zout" aria-label="Alejar">−</button>
+          <button class="tool" id="zin" aria-label="Acercar">+</button>
+          <button class="tool" id="zfit">ver todo</button>
+        </div>
+      </div>
+      <div id="mapwrap"><svg id="map" role="img" aria-label="Diagrama completo con el camino recorrido resaltado"><use href="#scene"/></svg></div>
+      <p class="legend">El mapa sigue tu posición. Las flechas punteadas vuelven a una pregunta anterior.</p>
+    </aside>
+  </div>
+</div>
+
+<dialog id="dlg"><div id="dlgbody"></div><form method="dialog"><button class="opt sys">cerrar</button></form></dialog>
+
+<script type="application/json" id="data">/*DATA*/</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const N = D.nodes, START = D.start, NS = "http://www.w3.org/2000/svg";
+  const LEAVES = Object.keys(N).filter(id => !N[id].o.length).sort((a, b) => N[a].b[1] - N[b].b[1] || N[a].b[0] - N[b].b[0]);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const STAGGER = reduce ? 0 : 380;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+
+  // ---------- escena ----------
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
+  const scene = document.getElementById("scene");
+  const rectEl = {}, edgeEl = [];
+  for (const [s, t, dashed, p] of D.scene.a) {
+    let d = `M${p[0]} ${p[1]}`; for (let i = 2; i < p.length; i += 2) d += ` L${p[i]} ${p[i + 1]}`;
+    const e = el("path", { d, class: "e", "marker-end": "url(#ah)" }, scene);
+    if (dashed) e.setAttribute("stroke-dasharray", "8 7");
+    edgeEl.push({ s, t, e });
+  }
+  for (const pts of D.scene.l) el("polyline", { points: pts.join(" "), class: "ln" }, scene);
+  for (const [id, x, y, w, h, f, s, dashed, sw] of D.scene.r) {
+    const r = el("rect", { x, y, width: w, height: h, rx: Math.min(16, Math.min(w, h) * .25), class: `n ${f ? "f-" + f : ""} ${s !== "ink" ? "s-" + s : ""}` }, scene);
+    if (dashed) r.setAttribute("stroke-dasharray", "6 5");
+    if (sw && sw !== 2) r.style.strokeWidth = sw;
+    if (id) rectEl[id] = r;
+  }
+  for (const [x, y, w, txt, fs, align, c, lh] of D.scene.t) {
+    const anchor = align === "center" ? "middle" : align === "right" ? "end" : "start";
+    const tx = align === "center" ? x + w / 2 : align === "right" ? x + w : x;
+    const g = el("text", { class: `tx ${c !== "ink" ? "c-" + c : ""}`, "font-size": fs, "text-anchor": anchor }, scene);
+    txt.split("\n").forEach((line, i) => { const t = el("tspan", { x: tx, y: y + (i + .5) * fs * lh, "dominant-baseline": "central" }, g); t.textContent = line; });
+  }
+  const crop = (id) => {
+    const [x, y, w, h] = N[id].b, m = 14;
+    const svg = el("svg", { viewBox: `${x - m} ${y - m} ${w + 2 * m} ${h + 2 * m}`, role: "img", "aria-label": N[id].t });
+    el("use", { href: "#scene" }, svg);
+    return svg;
+  };
+
+  // ---------- grafo ----------
+  const isFork = id => id.startsWith("fork:");
+  const isLeaf = id => !isFork(id) && !N[id].o.length;
+  // Después de una respuesta: si lleva a una sola caja del diagrama, seguimos ahí;
+  // si se abre en varias (o encadena otra respuesta tuya), hay un cruce "fork:".
+  const after = u => N[u].o.length === 1 && N[N[u].o[0].to].sp === "bot" ? N[u].o[0].to : "fork:" + u;
+  function options(stop) {
+    return N[isFork(stop) ? stop.slice(5) : stop].o.map(e => N[e.to].sp === "me"
+      ? { kind: "me", me: e.to, to: after(e.to), label: e.l || N[e.to].t }
+      : { kind: "go", to: e.to, label: e.l || N[e.to].t });
+  }
+
+  // ---------- estado ----------
+  let T = [], U = [], rendered = 0;
+  let found = new Set(store.get("qqo-found", []).filter(id => N[id] && isLeaf(id)));
+  const current = () => { for (let i = T.length - 1; i >= 0; i--) if (T[i].k === "bot") return T[i].n; return START; };
+
+  function advance(id) {
+    for (let guard = 0; ; guard++) {
+      T.push({ k: "bot", n: id });
+      const os = options(id);
+      if (!isFork(id) && os.length === 1 && os[0].kind === "go" && !N[id].nt && guard < 12) { id = os[0].to; continue; }
+      break;
+    }
+    if (isLeaf(id)) { found.add(id); store.set("qqo-found", [...found]); }
+  }
+  const meText = e => e.x && N[e.n].in ? N[e.n].in.fmt.replace("{x}", e.x) : N[e.n].t;
+  const drafts = {};
+  function choose(o, x) {
+    const at = current(), note = (drafts[at] || "").trim();
+    U.push(T.length);
+    if (note) T.push({ k: "note", n: at, x: note });
+    delete drafts[at];
+    T.push(o.kind === "me" ? (x ? { k: "me", n: o.me, x } : { k: "me", n: o.me }) : { k: "pick", text: o.label });
+    advance(o.to);
+    render();
+  }
+  function back() { if (!U.length) return; T.length = U.pop(); render(); }
+  function backToFork() {
+    while (U.length) { T.length = U.pop(); if (options(current()).length > 1) break; }
+    render();
+  }
+  function restart() { T = []; U = []; for (const k in drafts) delete drafts[k]; rendered = 0; document.getElementById("log").replaceChildren(); advance(START); render(); }
+
+  // ---------- render ----------
+  const log = document.getElementById("log"), optsEl = document.getElementById("opts");
+  const div = (cls, text) => { const d = document.createElement("div"); d.className = cls; if (text != null) d.textContent = text; return d; };
+
+  function entryEl(entry, idx) {
+    if (entry.k === "me") return div("me", meText(entry));
+    if (entry.k === "pick") return div("pick", "→ " + entry.text);
+    if (entry.k === "note") return div("note", entry.x);
+    const id = entry.n;
+    if (isFork(id)) return options(id).length > 1 ? div("say fork", "Desde acá salen varios caminos. Elegí uno; después podés volver y probar otro.") : div("pick", "");
+    if (isLeaf(id)) {
+      const box = div("final");
+      const n = LEAVES.indexOf(id) + 1;
+      box.append(div("eyebrow", `final ${n} de ${LEAVES.length}`), crop(id));
+      const sum = summaryEl(T.slice(0, idx));
+      if (sum) box.append(sum);
+      return box;
+    }
+    const b = div(`say ${N[id].f ? "f-" + N[id].f : ""}`);
+    if (id === START) { const s = document.createElement("span"); s.className = "start"; s.textContent = "ARRANCÁ ACÁ"; b.append(s); }
+    b.append(document.createTextNode(N[id].t));
+    if (T.slice(0, idx).some(e => e.k === "bot" && e.n === id)) b.append(div("again", "otra vez por acá"));
+    return b;
+  }
+
+  function render(instant) {
+    while (log.children.length > T.length) log.lastElementChild.remove();
+    rendered = Math.min(rendered, log.children.length);
+    let delay = 0;
+    for (let i = rendered; i < T.length; i++) {
+      const node = entryEl(T[i], i);
+      if (!instant) {
+        node.classList.add("new");
+        if (T[i].k === "bot" && i > rendered) delay += STAGGER;
+        node.style.animationDelay = delay + "ms";
+      }
+      log.append(node);
+    }
+    rendered = T.length;
+
+    optsEl.replaceChildren();
+    const cur = current();
+    const btn = (label, cls, fn) => { const b = document.createElement("button"); b.className = "opt " + cls; b.textContent = label; b.onclick = fn; b.classList.add("new"); b.style.animationDelay = delay + STAGGER * .6 + "ms"; optsEl.append(b); return b; };
+    if (isLeaf(cur)) {
+      if (U.length) btn("volver al último cruce", "sys", backToFork);
+      btn("empezar de nuevo", "sys", restart);
+    } else {
+      if (!isFork(cur) && N[cur].nt) {
+        const nb = div("notebox"), id = "note-" + cur;
+        nb.innerHTML = `<label for="${id}">(opcional) anotá acá tus respuestas. ya no viven solo en tu mente, ahora también están en tu navegador</label><textarea id="${id}" maxlength="1000"></textarea>`;
+        const ta = nb.querySelector("textarea");
+        ta.placeholder = N[cur].nt; ta.value = drafts[cur] || "";
+        ta.oninput = () => { drafts[cur] = ta.value; };
+        nb.classList.add("new"); nb.style.animationDelay = delay + STAGGER * .6 + "ms";
+        optsEl.append(nb);
+      }
+      for (const o of options(cur)) btn(o.label, o.kind === "go" ? "go" : "", () => o.kind === "me" && N[o.me].in ? ask(o) : choose(o));
+    }
+    document.getElementById("back").disabled = !U.length;
+    const nNotes = collect(T).reduce((a, g) => a + g.a.length, 0);
+    const mb = document.getElementById("mynotes");
+    mb.textContent = nNotes ? `tus notas (${nNotes})` : "tus notas"; mb.disabled = !nNotes;
+    paintMap(cur);
+    paintSlots();
+    store.set("qqo-game", { T, U });
+    requestAnimationFrame(() => optsEl.lastElementChild?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" }));
+  }
+
+  // Respuestas con campo ("quiero ___", "sí se" → para cuándo): lo que escribís queda en tu post-it (sólo en este navegador).
+  function ask(o) {
+    const cfg = N[o.me].in, id = "in-" + o.me;
+    const f = document.createElement("form"); f.className = "ask";
+    f.innerHTML = `<label for="${id}"></label><input id="${id}" maxlength="80" autocomplete="off"><button class="opt">listo</button><button type="button" class="opt sys">cancelar</button>`;
+    const input = f.querySelector("input");
+    f.querySelector("label").textContent = cfg.label;
+    input.placeholder = cfg.ph;
+    f.onsubmit = ev => { ev.preventDefault(); const x = input.value.trim().replace(/\s+/g, " "); choose(o, x || null); };
+    f.querySelector("button[type=button]").onclick = () => render(true);
+    optsEl.replaceChildren(f);
+    input.focus();
+  }
+
+  // ---------- tus notas ----------
+  // Agrupa lo que escribiste (campos y notas) bajo la pregunta que lo pidió, en orden de aparición.
+  function collect(entries) {
+    const groups = new Map(); let q = null;
+    for (const e of entries) {
+      if (e.k === "bot" && !isFork(e.n)) q = e.n;
+      const text = e.k === "note" ? e.x : e.k === "me" && e.x ? meText(e) : null;
+      if (!text) continue;
+      const key = e.k === "note" ? e.n : q;
+      if (!groups.has(key)) groups.set(key, { q: N[key] ? N[key].t : "", a: [] });
+      groups.get(key).a.push(text);
+    }
+    return [...groups.values()];
+  }
+  const asText = gs => gs.map(g => g.q + "\n" + g.a.map(a => "- " + a.replace(/\n/g, "\n  ")).join("\n")).join("\n\n");
+  function summaryEl(entries) {
+    const gs = collect(entries);
+    if (!gs.length) return null;
+    const box = div("summary");
+    box.append(div("eyebrow", "lo que anotaste"));
+    for (const g of gs) {
+      const sec = document.createElement("section"), h = document.createElement("h3"), ul = document.createElement("ul");
+      h.textContent = g.q;
+      for (const a of g.a) { const li = document.createElement("li"); li.textContent = a; ul.append(li); }
+      sec.append(h, ul); box.append(sec);
+    }
+    const row = div("row"), copy = document.createElement("button"), msg = document.createElement("span");
+    copy.className = "opt sys"; copy.type = "button"; copy.textContent = "copiar como texto"; msg.className = "legend";
+    copy.onclick = async () => {
+      const text = asText(gs);
+      try { await navigator.clipboard.writeText(text); msg.textContent = "copiado"; }
+      catch {
+        let ta = box.querySelector("textarea");
+        if (!ta) { ta = document.createElement("textarea"); ta.readOnly = true; ta.setAttribute("aria-label", "Tus notas como texto"); box.append(ta); }
+        ta.value = text; ta.select(); msg.textContent = "no pude copiar solo: el texto quedó seleccionado abajo";
+      }
+    };
+    row.append(copy, msg); box.append(row);
+    return box;
+  }
+  document.getElementById("mynotes").onclick = () => {
+    const sum = summaryEl(T);
+    if (!sum) return;
+    document.getElementById("dlgbody").replaceChildren(sum);
+    dlg.showModal();
+  };
+
+  // ---------- mapa ----------
+  const wrap = document.getElementById("mapwrap"), map = document.getElementById("map");
+  const [vx, vy, vw, vh] = D.view;
+  map.setAttribute("viewBox", D.view.join(" "));
+  let zoom = store.get("qqo-zoom", .45);
+  const fitZoom = () => Math.max(.08, (wrap.clientWidth - 4) / vw);
+  function setZoom(z, focus) {
+    zoom = Math.min(1.2, Math.max(fitZoom(), z));
+    map.setAttribute("width", vw * zoom); map.setAttribute("height", vh * zoom);
+    store.set("qqo-zoom", zoom);
+    focus && centerOn(current(), "auto");
+  }
+  function centerOn(id, behavior) {
+    if (isFork(id)) id = id.slice(5);
+    const [x, y, w, h] = N[id].b;
+    wrap.scrollTo({ left: (x - vx + w / 2) * zoom - wrap.clientWidth / 2, top: (y - vy + h / 2) * zoom - wrap.clientHeight / 2, behavior });
+  }
+  function paintMap(cur) {
+    const path = T.filter(e => e.k !== "pick" && e.k !== "note" && !(e.k === "bot" && isFork(e.n))).map(e => e.n);
+    const seen = new Set(path), steps = new Set();
+    for (let i = 1; i < path.length; i++) steps.add(path[i - 1] + ">" + path[i]);
+    for (const id in rectEl) { rectEl[id].classList.toggle("v", seen.has(id)); rectEl[id].classList.remove("cur"); }
+    const curId = isFork(cur) ? cur.slice(5) : cur;
+    rectEl[curId]?.classList.add("cur");
+    for (const { s, t, e } of edgeEl) {
+      const v = steps.has(s + ">" + t);
+      e.classList.toggle("v", v); e.setAttribute("marker-end", v ? "url(#ah-v)" : "url(#ah)");
+    }
+    if (wrap.offsetParent) centerOn(cur, reduce ? "auto" : "smooth");
+  }
+  document.getElementById("zin").onclick = () => setZoom(zoom * 1.4, true);
+  document.getElementById("zout").onclick = () => setZoom(zoom / 1.4, true);
+  document.getElementById("zfit").onclick = () => setZoom(0, false);
+
+  // ---------- finales ----------
+  const dlg = document.getElementById("dlg");
+  function paintSlots() {
+    document.getElementById("count").innerHTML = `finales encontrados <b>${found.size}</b> de ${LEAVES.length}`;
+    const slots = document.getElementById("slots"); slots.replaceChildren();
+    LEAVES.forEach((id, i) => {
+      const b = document.createElement("button");
+      const on = found.has(id);
+      b.className = "slot" + (on ? " on" : "");
+      b.textContent = on ? i + 1 : "?";
+      b.setAttribute("aria-label", on ? `Final ${i + 1}: ${N[id].t}` : `Final ${i + 1} sin descubrir`);
+      if (on) { b.title = N[id].t; b.onclick = () => { document.getElementById("dlgbody").replaceChildren(div("eyebrow", `final ${i + 1} de ${LEAVES.length}`), crop(id)); dlg.showModal(); }; }
+      else b.disabled = true;
+      slots.append(b);
+    });
+  }
+
+  // ---------- pestañas (celular) ----------
+  function setView(v) {
+    document.body.dataset.view = v;
+    for (const b of document.querySelectorAll(".tabs button")) b.setAttribute("aria-selected", String(b.dataset.view === v));
+    if (v === "map") requestAnimationFrame(() => { setZoom(zoom); centerOn(current(), "auto"); });
+  }
+  for (const b of document.querySelectorAll(".tabs button")) b.onclick = () => setView(b.dataset.view);
+  document.getElementById("back").onclick = back;
+  document.getElementById("restart").onclick = restart;
+
+  // ---------- arranque ----------
+  const valid = s => s && Array.isArray(s.T) && s.T.length && s.T.every(e => e.k === "pick" || (e.n && (N[e.n] || (isFork(e.n) && N[e.n.slice(5)]))));
+  function boot(data) {
+    const saved = valid(data) ? data : store.get("qqo-game", null);
+    if (valid(saved)) { T = saved.T; U = Array.isArray(saved.U) ? saved.U.filter(n => n < saved.T.length) : []; }
+    else advance(START);
+    setView("chat");
+    setZoom(zoom);
+    render(true);
+  }
+  try { window.claude?.hot?.snapshot?.(() => ({ T, U })); } catch {}
+  const hot = window.claude?.hot;
+  hot?.ready ? hot.ready(boot) : boot(hot?.data ?? {});
+})();
+</script>
